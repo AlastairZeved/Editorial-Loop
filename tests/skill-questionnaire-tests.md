@@ -1,6 +1,6 @@
 # Skill Questionnaire — Test Scenarios
 
-**Skill under test:** `~/.claude/skills/robs-editorial-loop/SKILL.md`
+**Skill under test:** `~/.claude/skills/editorial-loop/SKILL.md`
 **What this file is:** Manually verifiable acceptance criteria for the skill's interactive questionnaire flow. Each scenario defines inputs, validation expectations, and expected outputs. Not an automated test runner — these are reference scenarios for manual verification during development and review.
 
 ---
@@ -314,7 +314,7 @@ A valid Q3 submission unambiguously identifies the text to be edited. The skill 
 
 **Test 5.3 — File path reference**
 
-- **Input:** `/Users/rob/Documents/writing/vibe-coding-draft.md` — the section starting at "The real issue with vibe coding" through "not as intended." Preceding section ends on the paragraph about the first thrilling experience.
+- **Input:** `/Users/author/Documents/writing/vibe-coding-draft.md` — the section starting at "The real issue with vibe coding" through "not as intended." Preceding section ends on the paragraph about the first thrilling experience.
 - **Valid/Invalid:** VALID
 - **Why:** File path is absolute and specific. Section boundaries are named. Preceding context location is identified. Agents can retrieve the file and extract the relevant section.
 - **Expected outcome:** Skill accepts submission. Preceding context described by location (previous paragraph) — Flow Weld can locate the upstream context from the file.
@@ -332,7 +332,7 @@ A valid Q3 submission unambiguously identifies the text to be edited. The skill 
 
 **Test 5.5 — URL**
 
-- **Input:** `https://rob.substack.com/p/vibe-coding-risks` — the full post. The section on execution models is what needs editing; it starts after the "first thrilling experience" section.
+- **Input:** `https://example.substack.com/p/vibe-coding-risks` — the full post. The section on execution models is what needs editing; it starts after the "first thrilling experience" section.
 - **Valid/Invalid:** VALID
 - **Why:** URL is public and specific. Section to edit is identified by location within the document. Preceding context is identified ("after the first thrilling experience section"). Agents can retrieve and locate.
 - **Expected outcome:** Skill accepts submission. Preceding context identified by document structure — Flow Weld has upstream context.
@@ -424,7 +424,7 @@ This scenario demonstrates the complete valid flow from skill invocation to agen
 
 ### Invocation
 
-User invokes the skill by typing `/robs-editorial-loop` or asking Claude to edit a piece of writing.
+User invokes the skill by typing `/editorial-loop` or asking Claude to edit a piece of writing.
 
 **Skill trigger response:**
 
