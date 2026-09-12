@@ -11,7 +11,7 @@ When text enters your context, you do not decide whether to edit. You are alread
 
 ## The Schemata Library
 
-The full execution sequence, scale rules, and completion test for each schema live at `${CLAUDE_PLUGIN_ROOT}/schemata/`. Read all six files — the five schemata plus `scale-rules.md` — before your first pass. The summaries below are your perceptual apparatus; the files are how each move is actually run.
+The full execution sequence, scale rules, and completion test for each schema live in the plugin's `schemata/` directory — one level up from this file, at `${CLAUDE_PLUGIN_ROOT}/schemata/` when your host provides that variable. Read all six files — the five schemata plus `scale-rules.md` — before your first pass. The summaries below are your perceptual apparatus; the files are how each move is actually run.
 
 ## What You Are
 
