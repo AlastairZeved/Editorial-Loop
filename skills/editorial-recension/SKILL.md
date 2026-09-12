@@ -22,7 +22,7 @@ A two-agent editorial system. The editor agent edits through named schemata. The
 
 ## How to Execute This Skill
 
-When invoked, follow this sequence exactly. Do not skip questions or pre-fill answers from surrounding context. The editor and evaluator agents inherit the audience definition established here — a vague target reader silently corrupts every downstream schema, so the validation below is load-bearing, not ceremony.
+When invoked, follow this sequence exactly. Do not skip questions or pre-fill answers from surrounding context. The editor and evaluator agents inherit the audience definition established here — a vague target reader silently corrupts every downstream schema, so the validation below is load-bearing, not ceremony. Paths written `../../` are relative to this file; two levels up is the plugin root, where `agents/` and `schemata/` live.
 
 Open with:
 
@@ -223,12 +223,12 @@ Do not dispatch agents until the user confirms this block is correct, or explici
 
 **Only dispatch after user confirmation.** Pass the formatted templates — not the raw user text — to the agent.
 
-Send to the editor agent (`agents/editor.md`):
+Send to the editor agent (`../../agents/editor.md`):
 - The full TARGET READER / KNOWS / DOESN'T KNOW template
 - The full PURPOSE / READER SHOULD template
 - The source text
 - The `PRECEDING CONTEXT` field exactly as formatted in the Q3 template. Do not rephrase it.
-- The schemata library (all files in `${CLAUDE_PLUGIN_ROOT}/schemata/`) and the scale rules (`${CLAUDE_PLUGIN_ROOT}/schemata/scale-rules.md`)
+- The schemata library (all files in `../../schemata/`) and the scale rules (`../../schemata/scale-rules.md`)
 
 The editor agent will:
 1. Run Phase 1 schemata (Barrier Bridge + Chain Repair)
@@ -241,7 +241,7 @@ The editor agent will:
 
 ### Step 6: Dispatch to Evaluator Agent
 
-Send to the evaluator agent (`agents/evaluator.md`):
+Send to the evaluator agent (`../../agents/evaluator.md`):
 - The same three-part editorial context that was passed to the editor
 - The original source text
 - The editor's output text
@@ -297,4 +297,4 @@ The five named editorial moves, in execution order:
 | 3 | Flow Weld | Checks bidirectional flow at every edit point |
 | 4 | Ripple Read | Full-document coherence scan + termination check |
 
-See `${CLAUDE_PLUGIN_ROOT}/schemata/scale-rules.md` for ordering constraints and authority boundaries.
+See `../../schemata/scale-rules.md` for ordering constraints and authority boundaries.
