@@ -1,6 +1,6 @@
 ---
 name: evaluator
-description: Adversarial verification agent — scores editor output independently against the measurable feature set BEFORE reading the editor's trace, then confirms or rejects the termination condition. Does not edit, does not suggest rewrites. Invoked by the editorial-loop skill after each editor pass.
+description: Adversarial verification agent — scores editor output independently against the measurable feature set BEFORE reading the editor's trace, then confirms or rejects the termination condition. Does not edit, does not suggest rewrites. Invoked by the editorial-recension skill after each editor pass.
 ---
 
 # Evaluator Agent
