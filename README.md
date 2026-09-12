@@ -65,10 +65,11 @@ One rule applies everywhere: **install the whole directory, not just the skill f
 | Agents | `agents/editor.md`, `agents/evaluator.md` | The editor and evaluator the skill dispatches |
 | Schemata | `schemata/*.md` (6 files) | The five editing schemata plus `scale-rules.md`, the coordination layer |
 | Tests | `tests/` | Worked-case regression evidence; not loaded at runtime |
+| Marketplaces | `.agents/plugins/marketplace.json`, `.github/plugin/marketplace.json` | Codex and Copilot CLI marketplace catalogs pointing at the package root |
 
 ### Supported clients
 
-Install paths marked **verified** were exercised or checked against the client's current documentation; the others follow each client's documented Agent Plugins install mechanism.
+Install paths marked **verified** were exercised or checked against the client's current documentation (2026-09-12). Cursor is documented as loading Agent Plugins standard packages natively; Cline is not listed because its plugin system takes TypeScript SDK modules, not Agent Plugins packages — copy the repository into a `SKILL.md`-capable location instead (see [Any other agent](#any-other-agent)).
 
 **Hermes Agent** — *verified end to end (install → validate → remove):*
 
@@ -87,7 +88,7 @@ git clone https://github.com/AlastairZeved/Editorial-Recension.git
 claude --plugin-dir ./Editorial-Recension
 ```
 
-`--plugin-dir` loads the plugin for that session; see the [Claude Code plugins docs](https://code.claude.com/docs/en/plugins) for making it permanent. The repository ships no marketplace file, so the `/plugin marketplace add` route does not apply.
+`--plugin-dir` loads the plugin for that session; see the [Claude Code plugins docs](https://code.claude.com/docs/en/plugins) for making it permanent. The repository ships no Claude Code marketplace file, so the `/plugin marketplace add` route does not apply.
 
 **OpenClaw** — *verified against current CLI docs:*
 
@@ -95,16 +96,37 @@ claude --plugin-dir ./Editorial-Recension
 openclaw plugins install git:github.com/AlastairZeved/Editorial-Recension
 ```
 
-**Cursor, GitHub Copilot, and other conformant clients** — load the repository through the client's native Agent Plugins install mechanism (Cursor: **Customize** sidebar → Install; Copilot CLI: `copilot plugin install AlastairZeved/Editorial-Recension`). These routes follow the standard's root-manifest contract and were not exercised in this README's last verification pass.
+**Codex** — *verified against current Codex docs; the repository ships a repo marketplace (`.agents/plugins/marketplace.json`):*
 
-**Codex** — no one-command route today. Codex installs plugins from marketplaces, and this repository ships neither `.agents/plugins/marketplace.json` nor a `.codex-plugin/plugin.json` manifest. To use it with Codex, wire the repository into a local marketplace per the [Codex plugin docs](https://developers.openai.com/codex/plugins), or raise an issue if you want a Codex adapter shipped here.
+```sh
+codex plugin marketplace add AlastairZeved/Editorial-Recension
+```
+
+Then pick Editorial Recension from that marketplace in the Plugins Directory and install it. Codex loads this repository through its root Agent Plugins manifest — the documented package format. The optional `.codex-plugin/plugin.json` overlay is deliberately not shipped: its OpenAI-specific settings are superseded by the root manifest's `extensions["com.openai"]` object, and a present root object replaces the overlay entirely. Marketplace sources can be pinned (`codex plugin marketplace add AlastairZeved/Editorial-Recension --ref main`) or added from a local checkout (`codex plugin marketplace add ./Editorial-Recension`).
+
+**Cursor** — *verified against current vendor docs; no adapter file needed:*
+
+```sh
+git clone https://github.com/AlastairZeved/Editorial-Recension.git
+```
+
+Open **Customize** in the Cursor sidebar, find Editorial Recension, and select **Install** (choose project or user scope). Cursor loads Agent Plugins standard packages — a root `plugin.json` plus `skills/` — without changes, so no Cursor-specific manifest ships here.
+
+**GitHub Copilot** — *verified against current vendor docs; the repository ships a Copilot marketplace (`.github/plugin/marketplace.json`):*
+
+```sh
+copilot plugin marketplace add AlastairZeved/Editorial-Recension
+copilot plugin install editorial-recension@editorial-recension
+```
+
+`copilot plugin install AlastairZeved/Editorial-Recension` also works: the install command accepts a GitHub repository root directly, without a marketplace.
 
 ### Any other agent
 
 Two universal routes:
 
 - **SKILL.md-capable agents** — copy the whole repository (or clone it) into the agent's skill/plugin discovery directory. Any agent that reads `SKILL.md` files picks up `skills/editorial-recension/SKILL.md`; the `../../` references resolve because the bundle is intact.
-- **Validation without installing** — `npx plugins.sh validate https://github.com/AlastairZeved/Editorial-Recension` checks the package against the Agent Plugins schema from any machine. The root manifest reports conformant; the `.claude-plugin/` client adapter reports schema warnings that are cosmetic (it follows Claude Code's manifest format, not the portable one). Note this repository is not listed in the plugins.sh registry, so `plugins.sh install` will not resolve it.
+- **Validation without installing** — `npx plugins.sh validate https://github.com/AlastairZeved/Editorial-Recension` checks the package against the Agent Plugins schema from any machine. The root manifest reports conformant; the `.claude-plugin/` client adapter reports schema warnings that are cosmetic (it follows Claude Code's manifest format, not the portable one). This repository is not yet listed in the [plugins.sh directory](https://plugins.sh) — listing is a manual form submission reviewed by the registry's maintainer — so `npx plugins.sh install AlastairZeved/Editorial-Recension` will not resolve until that submission lands. Use the client routes above, or `hermes plugins install` / `openclaw plugins install`, which do not depend on the registry.
 
 ## Usage
 
@@ -240,7 +262,7 @@ Questions and bug reports go to [GitHub issues](https://github.com/AlastairZeved
 - Open an issue describing the problem before a large change.
 - Keep terminology consistent with the schemata (`schemata/`) and the agents (`agents/`) — Barrier Bridge, Chain Repair, Compression Pass, Flow Weld, Ripple Read, and the feature set are the project's vocabulary.
 - If you change behavior, add or update the corresponding evidence in `tests/` so the worked case keeps demonstrating the full loop.
-- Keep the packaging layers in sync: the portable layer (root `plugin.json` + `skills/`) is the standard-conformant package and the source of truth; client adapters (`.claude-plugin/`, `agents/` for Claude Code) describe the same system and must not drift from it. If a component moves, update the manifests and any path references on both sides.
+- Keep the packaging layers in sync: the portable layer (root `plugin.json` + `skills/`) is the standard-conformant package and the source of truth; client adapters (`.claude-plugin/`, `agents/` for Claude Code, `.agents/plugins/marketplace.json` for Codex, `.github/plugin/marketplace.json` for Copilot CLI) describe the same system and must not drift from it. If a component moves, update the manifests, the marketplace entries, and any path references on both sides.
 
 ## License
 
