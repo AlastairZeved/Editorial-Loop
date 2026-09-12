@@ -1,6 +1,6 @@
 # Skill Questionnaire — Test Scenarios
 
-**Skill under test:** `~/.claude/skills/editorial-loop/SKILL.md`
+**Skill under test:** `~/.claude/skills/editorial-recension/SKILL.md`
 **What this file is:** Manually verifiable acceptance criteria for the skill's interactive questionnaire flow. Each scenario defines inputs, validation expectations, and expected outputs. Not an automated test runner — these are reference scenarios for manual verification during development and review.
 
 ---
@@ -424,11 +424,11 @@ This scenario demonstrates the complete valid flow from skill invocation to agen
 
 ### Invocation
 
-User invokes the skill by typing `/editorial-loop` or asking Claude to edit a piece of writing.
+User invokes the skill by typing `/editorial-recension` or asking Claude to edit a piece of writing.
 
 **Skill trigger response:**
 
-> I'll run the editorial loop. Before dispatching agents, I need three things that the agents can't guess: who they're editing for, what the text needs to accomplish, and the text itself.
+> I'll run the editorial recension. Before dispatching agents, I need three things that the agents can't guess: who they're editing for, what the text needs to accomplish, and the text itself.
 >
 > **Question 1: Target Reader**
 >

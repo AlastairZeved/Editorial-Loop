@@ -1,9 +1,9 @@
 ---
-name: editorial-loop
+name: editorial-recension
 description: Use when editing prose, essays, guides, or any writing meant to carry a reader through a reasoning chain — especially cross-domain writing where the author has expertise the reader does not
 ---
 
-# Editorial Loop
+# Editorial Recension
 
 A two-agent editorial system. The editor agent edits through named schemata. The evaluator agent scores the output against measurable features. They loop until the evaluator confirms the termination condition.
 
@@ -26,7 +26,7 @@ When invoked, follow this sequence exactly. Do not skip questions or pre-fill an
 
 Open with:
 
-> I'll run the editorial loop. Before dispatching agents, I need three things they can't guess: who they're editing for, what the text needs to accomplish, and the text itself.
+> I'll run the editorial recension. Before dispatching agents, I need three things they can't guess: who they're editing for, what the text needs to accomplish, and the text itself.
 
 ---
 

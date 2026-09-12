@@ -1,4 +1,4 @@
-# Editorial Loop _(Editorial-Loop)_
+# Editorial Recension _(Editorial-Recension)_
 
 [![Standard Readme](https://img.shields.io/badge/standard--readme-fde047.svg)](https://github.com/RichardLitt/standard-readme)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
@@ -6,11 +6,11 @@
 
 Two-agent editing loop for Claude Code that edits prose until readers without the author's expertise can follow it.
 
-Editorial Loop is a two-agent editorial system packaged as a Claude Code plugin. Its purpose is narrow and specific: edit prose until a reader who lacks the author's domain expertise can follow the reasoning chain; not until it "reads well" to someone who already understands it.
+Editorial Recension is a two-agent editorial system packaged as a Claude Code plugin. Its purpose is narrow and specific: edit prose until a reader who lacks the author's domain expertise can follow the reasoning chain; not until it "reads well" to someone who already understands it.
 
 The system has two agents and a controller. The **editor** agent holds five named schemata — Barrier Bridge, Chain Repair, Compression Pass, Flow Weld, and Ripple Read — as its perceptual apparatus, and runs them in phases over your text. The **evaluator** agent scores the result against a measurable feature set *before* it reads the editor's explanation of what it did, then confirms or rejects the editor's claim that the text is done. They loop until the evaluator confirms the termination condition, or until five cycles are spent.
 
-This repository is the plugin source. The product name is "Editorial Loop"; the repository folder and plugin package are `Editorial-Loop` / `editorial-loop` — the difference is casing only, not a rename.
+This repository is the plugin source. The product name is "Editorial Recension"; the repository folder and plugin package are `Editorial-Recension` / `editorial-recension` — the difference is casing only, not a rename.
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ This repository is the plugin source. The product name is "Editorial Loop"; the 
 
 The starting observation is in the repo's own test evidence: ordinary single-pass editing optimizes for "reads well to someone who already understands it." A cleaner, tighter edit can leave every barrier intact — jargon ungrounded, reasoning asserted rather than derived, the register yanked mid-text. That is the opposite of the job when the writing has to carry a reader across a knowledge gap.
 
-Editorial Loop is built to close that gap. Its architecture comes from four older disciplines, translated into editorial moves:
+Editorial Recension is built to close that gap. Its architecture comes from four older disciplines, translated into editorial moves:
 
 - **Forensic linguistics** — the evaluator is modeled on a questioned-document examiner: it checks a produced document against known standards instead of asking whether it feels good.
 - **Species counterpoint** — the five schemata are meant to be perceived simultaneously, the way a musician hears pitch, rhythm, and harmony at once, then executed in phases so the moves don't interfere with each other.
@@ -44,11 +44,11 @@ Editorial Loop is built to close that gap. Its architecture comes from four olde
 
 ## Install
 
-Editorial Loop is a Claude Code plugin. This repository ships no marketplace file, so the `/plugin marketplace add` route does not apply. Load it directly with `--plugin-dir`:
+Editorial Recension is a Claude Code plugin. This repository ships no marketplace file, so the `/plugin marketplace add` route does not apply. Load it directly with `--plugin-dir`:
 
 ```sh
-git clone https://github.com/AlastairZeved/Editorial-Loop.git
-cd Editorial-Loop
+git clone https://github.com/AlastairZeved/Editorial-Recension.git
+cd Editorial-Recension
 claude --plugin-dir .
 ```
 
@@ -114,13 +114,13 @@ Evaluator Verdict  — PASS with a feature summary, or best-effort with remainin
 
 The architecture has four layers.
 
-**Layer 1 — Intake** (`skills/editorial-loop/SKILL.md`). The skill validates the three questions, formats them into templates, and dispatches only after you confirm the context block. It escalates on vague answers: one targeted clarification, then a direct checklist — it does not accept vagueness out of politeness.
+**Layer 1 — Intake** (`skills/editorial-recension/SKILL.md`). The skill validates the three questions, formats them into templates, and dispatches only after you confirm the context block. It escalates on vague answers: one targeted clarification, then a direct checklist — it does not accept vagueness out of politeness.
 
 **Layer 2 — Execution** (`agents/editor.md` + `schemata/`). The editor reads all six schemata files, then runs four phases: Barrier Bridge and Chain Repair together, then Compression Pass, then Flow Weld, then Ripple Read. If Ripple Read finds gaps, it dispatches them back to the responsible schema with specific, located feedback. The editor returns edited text, a schema trace of what fired where, and a termination assessment.
 
 **Layer 3 — Verification** (`agents/evaluator.md`). The evaluator scores the output against every measurable feature *before* reading the editor's trace, then compares its independent scoring to the trace. Discrepancies are the most important findings: either the editor ran a schema without the work showing (execution failure), or skipped a schema and claimed it ran (compliance failure). It returns feature scores, discrepancies, and a PASS/FAIL verdict.
 
-**Layer 4 — Loop** (`skills/editorial-loop/SKILL.md`). On FAIL, the evaluator's located feedback goes back to the editor, which re-enters at the phase where the failures were found. On PASS, the termination condition is confirmed and the final output is presented. Limits:
+**Layer 4 — Loop** (`skills/editorial-recension/SKILL.md`). On FAIL, the evaluator's located feedback goes back to the editor, which re-enters at the phase where the failures were found. On PASS, the termination condition is confirmed and the final output is presented. Limits:
 
 - Maximum **5 editor↔evaluator cycles** per session.
 - Each cycle should converge — fewer failures than the last. If failures are not decreasing after cycle 3, the skill surfaces this and lets you decide.
@@ -173,7 +173,7 @@ Together the files demonstrate four things: the paragraph has three defects, a b
 
 There is no code API. The plugin's surface is three components Claude Code loads from the manifest (`.claude-plugin/plugin.json`):
 
-- **Skill — `skills/editorial-loop/SKILL.md`.** Auto-fires on prose-editing requests. Input: the user's request and text. Output: the intake questionnaire, then the final edited text with trace and verdict.
+- **Skill — `skills/editorial-recension/SKILL.md`.** Auto-fires on prose-editing requests. Input: the user's request and text. Output: the intake questionnaire, then the final edited text with trace and verdict.
 - **Agent — `agents/editor.md`.** Input: the formatted editorial context (target reader, purpose, source text, preceding context) plus the schemata library. Output: edited text, schema trace, termination assessment.
 - **Agent — `agents/evaluator.md`.** Input: the same editorial context, the original text, the editor's output, and the editor's trace (read only *after* independent scoring). Output: feature scores, trace discrepancies, PASS/FAIL verdict.
 
@@ -187,7 +187,7 @@ To [Richard Litt](https://github.com/RichardLitt) and the [Standard Readme](http
 
 ## Contributing
 
-Questions and bug reports go to [GitHub issues](https://github.com/AlastairZeved/Editorial-Loop/issues). PRs are accepted — there is no CONTRIBUTING file or Code of Conduct in the repository yet, so please:
+Questions and bug reports go to [GitHub issues](https://github.com/AlastairZeved/Editorial-Recension/issues). PRs are accepted — there is no CONTRIBUTING file or Code of Conduct in the repository yet, so please:
 
 - Open an issue describing the problem before a large change.
 - Keep terminology consistent with the schemata (`schemata/`) and the agents (`agents/`) — Barrier Bridge, Chain Repair, Compression Pass, Flow Weld, Ripple Read, and the feature set are the project's vocabulary.
