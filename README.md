@@ -2,12 +2,11 @@
 
 [![Standard Readme](https://img.shields.io/badge/standard--readme-fde047.svg)](https://github.com/RichardLitt/standard-readme)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-7c3aed.svg)](https://code.claude.com/docs/en/plugins)
 [![Agent Plugins 1.0.0](https://img.shields.io/badge/Agent%20Plugins-1.0.0-059669.svg)](https://github.com/agentplugins/agent-plugins-spec)
 
-Two-agent editing loop for Claude Code and Agent Plugins-compatible agents that edits prose until readers without the author's expertise can follow it.
+A two-agent editing loop that rewrites prose until readers without the author's expertise can follow it.
 
-Editorial Recension is a two-agent editorial system packaged as a Claude Code plugin and as a portable Agent Plugins 1.0.0 package. Its purpose is narrow and specific: edit prose until a reader who lacks the author's domain expertise can follow the reasoning chain; not until it "reads well" to someone who already understands it.
+Editorial Recension is a two-agent editorial system packaged as a portable [Agent Plugins 1.0.0](https://github.com/agentplugins/agent-plugins-spec) package that runs on any conformant agent client. Its purpose is narrow and specific: edit prose until a reader who lacks the author's domain expertise can follow the reasoning chain — not until it "reads well" to someone who already understands it.
 
 The system has two agents and a controller. The **editor** agent holds five named schemata — Barrier Bridge, Chain Repair, Compression Pass, Flow Weld, and Ripple Read — as its perceptual apparatus, and runs them in phases over your text. The **evaluator** agent scores the result against a measurable feature set *before* it reads the editor's explanation of what it did, then confirms or rejects the editor's claim that the text is done. They loop until the evaluator confirms the termination condition, or until five cycles are spent.
 
@@ -18,7 +17,9 @@ This repository is the plugin source. The product name is "Editorial Recension";
 - [Background](#background)
 - [Install](#install)
   - [Dependencies](#dependencies)
-  - [Other agents](#other-agents)
+  - [What ships in the package](#what-ships-in-the-package)
+  - [Supported clients](#supported-clients)
+  - [Any other agent](#any-other-agent)
 - [Usage](#usage)
   - [The intake questionnaire](#the-intake-questionnaire)
   - [What you get back](#what-you-get-back)
@@ -46,35 +47,68 @@ Editorial Recension is built to close that gap. Its architecture comes from four
 
 ## Install
 
-Editorial Recension ships two packaging layers in one repository: a Claude Code plugin and a portable [Agent Plugins 1.0.0](https://github.com/agentplugins/agent-plugins-spec) package. For Claude Code: the repository ships no marketplace file, so the `/plugin marketplace add` route does not apply — load it directly with `--plugin-dir`:
+Editorial Recension is a portable [Agent Plugins 1.0.0](https://github.com/agentplugins/agent-plugins-spec) package: a root `plugin.json` manifest (schema `https://agent-plugins.org/schemas/1.0.0/plugin.schema.json`) plus a top-level `skills/` directory. The repository is markdown and JSON — no build step — and installs on any conformant client.
 
-```sh
-git clone https://github.com/AlastairZeved/Editorial-Recension.git
-cd Editorial-Recension
-claude --plugin-dir .
-```
-
-`--plugin-dir` loads the plugin for that session. To have it available on every launch, copy the directory into your Claude Code plugins/skills directory (see the [Claude Code plugins docs](https://code.claude.com/docs/en/plugins) for the current mechanics). When loaded as a plugin, Claude Code resolves `${CLAUDE_PLUGIN_ROOT}` to the plugin's own directory — which is how `agents/editor.md` locates the schemata at runtime. The skill itself needs no host variable: it references `agents/` and `schemata/` through relative paths that resolve wherever the plugin is installed intact.
+One rule applies everywhere: **install the whole directory, not just the skill folder.** The skill references `agents/` and `schemata/` through relative paths (`../../` from the skill file), so those paths resolve only when the bundle is installed intact. Clients without a native subagent mechanism can run the contents of `agents/editor.md` and `agents/evaluator.md` inline as prompts.
 
 ### Dependencies
 
-- [Claude Code](https://code.claude.com/docs/en/plugins) — the runtime for the Claude Code route; the plugin is markdown and JSON, with no build step.
-- Any [Agent Plugins 1.0.0](https://github.com/agentplugins/agent-plugins-spec)-compatible client — for the portable route.
+- Any [Agent Plugins 1.0.0](https://github.com/agentplugins/agent-plugins-spec)-compatible agent client — see [Supported clients](#supported-clients).
+- No runtime, package manager, or build tooling. The package is markdown and JSON.
 
-### Other agents
+### What ships in the package
 
-The repository is also a portable [Agent Plugins 1.0.0](https://github.com/agentplugins/agent-plugins-spec) plugin: a root `plugin.json` manifest plus the top-level `skills/` directory. The Claude Code packaging (`.claude-plugin/`, `agents/`) stays in place — the two layers coexist in one repository.
+| Component | Path | Role |
+|---|---|---|
+| Manifest | `plugin.json` | Agent Plugins 1.0.0 manifest — what clients validate and load |
+| Skill | `skills/editorial-recension/SKILL.md` | The controller: intake questionnaire, dispatch, loop |
+| Agents | `agents/editor.md`, `agents/evaluator.md` | The editor and evaluator the skill dispatches |
+| Schemata | `schemata/*.md` (6 files) | The five editing schemata plus `scale-rules.md`, the coordination layer |
+| Tests | `tests/` | Worked-case regression evidence; not loaded at runtime |
 
-- **OpenClaw** — `openclaw plugins install git:github.com/AlastairZeved/Editorial-Recension`
-- **Codex** — `codex plugin add ./Editorial-Recension` (0.146.0+)
-- **Cline** — install the packaged plugin directory into `~/.agents/plugins/`; Cline's Hub discovers and validates it there
-- **Any other conformant client** — `npx agpx add AlastairZeved/Editorial-Recension` copies the portable skill into the client's skill directory
+### Supported clients
 
-Scope of the portable layer: the skill travels; the two agent files (`agents/`) ship inside the bundle and are referenced by relative path, so clients without a native subagent mechanism can run their content inline as prompts. The skill's `../../` paths resolve from the skill file to the plugin root whenever the bundle is installed intact.
+Install paths marked **verified** were exercised or checked against the client's current documentation; the others follow each client's documented Agent Plugins install mechanism.
+
+**Hermes Agent** — *verified end to end (install → validate → remove):*
+
+```sh
+hermes plugins install AlastairZeved/Editorial-Recension --no-enable
+hermes plugins enable editorial-recension
+hermes gateway restart
+```
+
+Hermes scans community plugin sources at install time and may ask you to confirm before proceeding. `hermes plugins validate editorial-recension` checks the manifest without enabling anything.
+
+**Claude Code** — *verified against current vendor docs:*
+
+```sh
+git clone https://github.com/AlastairZeved/Editorial-Recension.git
+claude --plugin-dir ./Editorial-Recension
+```
+
+`--plugin-dir` loads the plugin for that session; see the [Claude Code plugins docs](https://code.claude.com/docs/en/plugins) for making it permanent. The repository ships no marketplace file, so the `/plugin marketplace add` route does not apply.
+
+**OpenClaw** — *verified against current CLI docs:*
+
+```sh
+openclaw plugins install git:github.com/AlastairZeved/Editorial-Recension
+```
+
+**Cursor, GitHub Copilot, and other conformant clients** — load the repository through the client's native Agent Plugins install mechanism (Cursor: **Customize** sidebar → Install; Copilot CLI: `copilot plugin install AlastairZeved/Editorial-Recension`). These routes follow the standard's root-manifest contract and were not exercised in this README's last verification pass.
+
+**Codex** — no one-command route today. Codex installs plugins from marketplaces, and this repository ships neither `.agents/plugins/marketplace.json` nor a `.codex-plugin/plugin.json` manifest. To use it with Codex, wire the repository into a local marketplace per the [Codex plugin docs](https://developers.openai.com/codex/plugins), or raise an issue if you want a Codex adapter shipped here.
+
+### Any other agent
+
+Two universal routes:
+
+- **SKILL.md-capable agents** — copy the whole repository (or clone it) into the agent's skill/plugin discovery directory. Any agent that reads `SKILL.md` files picks up `skills/editorial-recension/SKILL.md`; the `../../` references resolve because the bundle is intact.
+- **Validation without installing** — `npx plugins.sh validate https://github.com/AlastairZeved/Editorial-Recension` checks the package against the Agent Plugins schema from any machine. The root manifest reports conformant; the `.claude-plugin/` client adapter reports schema warnings that are cosmetic (it follows Claude Code's manifest format, not the portable one). Note this repository is not listed in the plugins.sh registry, so `plugins.sh install` will not resolve it.
 
 ## Usage
 
-There is no CLI binary to call. You use it inside a Claude Code session, by asking for the thing the skill is built for:
+There is no CLI binary to call. You use it inside a session with your agent, by asking for the thing the skill is built for:
 
 ```text
 > Edit this paragraph so someone without my background can follow the reasoning.
@@ -185,7 +219,7 @@ Together the files demonstrate four things: the paragraph has three defects, a b
 
 ## API
 
-There is no code API. The plugin's surface is three components. Claude Code loads them from the manifest (`.claude-plugin/plugin.json`); portable Agent Plugins clients load the same skill through the root `plugin.json`:
+There is no code API. The package's surface is three components, loaded through the root `plugin.json` manifest:
 
 - **Skill — `skills/editorial-recension/SKILL.md`.** Auto-fires on prose-editing requests. Input: the user's request and text. Output: the intake questionnaire, then the final edited text with trace and verdict.
 - **Agent — `agents/editor.md`.** Input: the formatted editorial context (target reader, purpose, source text, preceding context) plus the schemata library. Output: edited text, schema trace, termination assessment.
@@ -206,7 +240,7 @@ Questions and bug reports go to [GitHub issues](https://github.com/AlastairZeved
 - Open an issue describing the problem before a large change.
 - Keep terminology consistent with the schemata (`schemata/`) and the agents (`agents/`) — Barrier Bridge, Chain Repair, Compression Pass, Flow Weld, Ripple Read, and the feature set are the project's vocabulary.
 - If you change behavior, add or update the corresponding evidence in `tests/` so the worked case keeps demonstrating the full loop.
-- Keep the two packaging layers in sync: the portable layer (root `plugin.json` + `skills/`) and the Claude Code layer (`.claude-plugin/plugin.json` + `agents/`) describe the same system — if a component moves, update both manifests and any path references.
+- Keep the packaging layers in sync: the portable layer (root `plugin.json` + `skills/`) is the standard-conformant package and the source of truth; client adapters (`.claude-plugin/`, `agents/` for Claude Code) describe the same system and must not drift from it. If a component moves, update the manifests and any path references on both sides.
 
 ## License
 
