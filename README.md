@@ -102,7 +102,7 @@ openclaw plugins install git:github.com/AlastairZeved/Editorial-Recension
 codex plugin marketplace add AlastairZeved/Editorial-Recension
 ```
 
-Then pick Editorial Recension from that marketplace in the Plugins Directory and install it. Codex loads this repository through its root Agent Plugins manifest — the documented package format. The optional `.codex-plugin/plugin.json` overlay is deliberately not shipped: its OpenAI-specific settings are superseded by the root manifest's `extensions["com.openai"]` object, and a present root object replaces the overlay entirely. Marketplace sources can be pinned (`codex plugin marketplace add AlastairZeved/Editorial-Recension --ref main`) or added from a local checkout (`codex plugin marketplace add ./Editorial-Recension`).
+Then pick Editorial Recension from that marketplace in the Plugins Directory and install it. Codex loads this repository through its root Agent Plugins manifest — the documented package format. The optional `.codex-plugin/plugin.json` overlay is deliberately not shipped: the docs route OpenAI-specific presentation and settings through `extensions.com.openai` in the root manifest, with `.codex-plugin/plugin.json` remaining supported only as a compatibility fallback. Marketplace sources can be pinned (`codex plugin marketplace add AlastairZeved/Editorial-Recension --ref main`) or added from a local checkout (`codex plugin marketplace add ./Editorial-Recension`).
 
 **Cursor** — *verified against current vendor docs; no adapter file needed:*
 
